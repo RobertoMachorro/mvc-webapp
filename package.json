@@ -18,5 +18,15 @@
   "bugs": {
     "url": "https://github.com/ChildRescueCoalition/webapp/issues"
   },
-  "homepage": "https://github.com/ChildRescueCoalition/webapp#readme"
+  "homepage": "https://github.com/ChildRescueCoalition/webapp#readme",
+  "dependencies": {
+    "debug": "^4.1.1",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "xo": "^0.25.4"
+  },
+  "xo": {
+    "semicolon": false
+  }
 }
