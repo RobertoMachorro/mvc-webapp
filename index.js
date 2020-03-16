@@ -6,7 +6,7 @@ const http = require('http')
 const core = require('./core')
 
 exports.start = function (applicationRoot, listenPort) {
-	debug('listenPort', listenPort)
+	debug('port', listenPort)
 
 	const app = core.create(applicationRoot, listenPort)
 	const server = http.createServer(app)
@@ -41,5 +41,5 @@ function onError(error) {
 }
 
 function onListening() {
-	debug('online')
+	debug('is', this.listening? 'online' : 'offline')
 }
