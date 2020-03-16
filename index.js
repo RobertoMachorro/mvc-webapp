@@ -14,7 +14,7 @@ exports.start = function (applicationRoot, listenPort) {
 	server.on('error', onError)
 	server.on('listening', onListening)
 
-	server.listen(listenPort)
+	return server.listen(listenPort)
 }
 
 function onError(error) {
