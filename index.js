@@ -37,5 +37,5 @@ function onError(error) {
 }
 
 function onListening() {
-	debug('is', this.listening? 'online' : 'offline')
+	debug('is', this.listening ? 'online' : 'offline')
 }
