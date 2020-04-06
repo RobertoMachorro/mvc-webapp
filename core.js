@@ -51,20 +51,20 @@ exports.create = function (options) {
 		}))
 	}
 
+	app.use((req, res, next) => {
+		if (!req.session) {
+			throw new Error('No session handler found.')
+		}
+
+		next()
+	})
+
 	return app
 }
 
-/*
+/* PREVIOUS SUPPORT
 const fs = require('fs')
 const createError = require('http-errors')
-
-app.use((req, res, next) => {
-	if (!req.session) {
-		throw new Error('No session handler found.')
-	}
-
-	next()
-})
 
 // Ensure secure connection in production
 app.use((req, res, next) => {
