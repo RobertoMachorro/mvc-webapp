@@ -4,6 +4,7 @@ const debug = require('debug')('webapp:core')
 const express = require('express')
 const session = require('express-session')
 const redis = require('redis')
+const logger = require('morgan')
 const path = require('path')
 
 exports.create = function (options) {
@@ -16,7 +17,8 @@ exports.create = function (options) {
 	app.set('views', path.join(options.applicationRoot, 'application/views'))
 	app.set('view engine', 'ejs')
 
-	//app.use(logger('dev'))
+	// Engine options
+	app.use(logger('dev'))
 	app.use(express.json())
 	app.use(express.urlencoded({extended: false}))
 	app.use(express.static(path.join(options.applicationRoot, 'application/public')))
@@ -55,7 +57,6 @@ exports.create = function (options) {
 /*
 const fs = require('fs')
 const createError = require('http-errors')
-const logger = require('morgan')
 
 app.use((req, res, next) => {
 	if (!req.session) {
