@@ -20,8 +20,12 @@
   },
   "homepage": "https://github.com/ChildRescueCoalition/webapp#readme",
   "dependencies": {
+    "connect-redis": "^4.0.4",
     "debug": "^4.1.1",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "express-session": "^1.17.0",
+    "memorystore": "^1.6.2",
+    "redis": "^3.0.2"
   },
   "devDependencies": {
     "xo": "^0.25.4"
