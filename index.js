@@ -6,7 +6,7 @@ const http = require('http')
 const core = require('./core')
 
 exports.run = function (options) {
-	// PENDING Check options
+	// TODO: Check options
 
 	debug('port', options.listenPort)
 
