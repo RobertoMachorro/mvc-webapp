@@ -5,16 +5,18 @@ const http = require('http')
 
 const core = require('./core')
 
-exports.run = function (applicationRoot, listenPort) {
-	debug('port', listenPort)
+exports.run = function (options) {
+	// PENDING Check options
 
-	const app = core.create(applicationRoot, listenPort)
+	debug('port', options.listenPort)
+
+	const app = core.create(options)
 	const server = http.createServer(app)
 
 	server.on('error', onError)
 	server.on('listening', onListening)
 
-	return server.listen(listenPort)
+	return server.listen(options.listenPort)
 }
 
 function onError(error) {

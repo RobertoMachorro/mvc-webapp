@@ -1,23 +1,53 @@
 'use strict'
 
-const path = require('path')
 const debug = require('debug')('webapp:core')
 const express = require('express')
+const session = require('express-session')
+const redis = require('redis')
+const path = require('path')
 
-exports.create = function (applicationRoot, listenPort) {
-	debug('application root', applicationRoot)
+exports.create = function (options) {
+	debug('application root', options.applicationRoot)
 
 	const app = express()
-	app.set('port', listenPort)
+	app.set('port', options.listenPort)
 
 	// View engine setup
-	app.set('views', path.join(applicationRoot, 'application/views'))
+	app.set('views', path.join(options.applicationRoot, 'application/views'))
 	app.set('view engine', 'ejs')
 
 	//app.use(logger('dev'))
 	app.use(express.json())
 	app.use(express.urlencoded({extended: false}))
-	app.use(express.static(path.join(applicationRoot, 'application/public')))
+	app.use(express.static(path.join(options.applicationRoot, 'application/public')))
+
+	// Session storage
+	if (options.sessionRedisUrl) {
+		const RedisStore = require('connect-redis')(session)
+		const client = redis.createClient({
+			url: options.sessionRedisUrl
+		})
+		app.enable('trust proxy')
+		debug('Setting up for Redis session management.')
+		app.use(session({
+			secret: options.sessionSecret,
+			resave: false,
+			saveUninitialized: false,
+			store: new RedisStore({client})
+		}))
+	} else {
+		const MemoryStore = require('memorystore')(session)
+		debug('Setting up for Memory session management.')
+		app.use(session({
+			secret: options.sessionSecret,
+			resave: false,
+			saveUninitialized: false,
+			store: new MemoryStore({
+				ttl: 600000, // TTL with 10m
+				checkPeriod: 3600000 // Prune expired entries every 1h
+			})
+		}))
+	}
 
 	return app
 }
@@ -25,37 +55,7 @@ exports.create = function (applicationRoot, listenPort) {
 /*
 const fs = require('fs')
 const createError = require('http-errors')
-const session = require('express-session')
-const redis = require('redis')
 const logger = require('morgan')
-
-// Session storage
-if (process.env.REDISCLOUD_URL) {
-	const RedisStore = require('connect-redis')(session)
-	const client = redis.createClient({
-		url: process.env.REDISCLOUD_URL
-	})
-	app.enable('trust proxy')
-	debug('Setting up for Redis session management.')
-	app.use(session({
-		secret: process.env.SESSION_SECRET || 'NOT_SO_SECRET',
-		resave: false,
-		saveUninitialized: false,
-		store: new RedisStore({client})
-	}))
-} else {
-	const MemoryStore = require('memorystore')(session)
-	debug('Setting up for Memory session management.')
-	app.use(session({
-		secret: process.env.SESSION_SECRET || 'NOT_SO_SECRET',
-		resave: false,
-		saveUninitialized: false,
-		store: new MemoryStore({
-			ttl: 600000, // TTL with 10m
-			checkPeriod: 3600000 // Prune expired entries every 1h
-		})
-	}))
-}
 
 app.use((req, res, next) => {
 	if (!req.session) {
