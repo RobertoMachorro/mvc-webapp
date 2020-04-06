@@ -1,11 +1,11 @@
 'use strict'
 
-const debug = require('debug')('webapp:service')
+const debug = require('debug')('webapp:server')
 const http = require('http')
 
 const core = require('./core')
 
-exports.start = function (applicationRoot, listenPort) {
+exports.run = function (applicationRoot, listenPort) {
 	debug('port', listenPort)
 
 	const app = core.create(applicationRoot, listenPort)
@@ -22,9 +22,7 @@ function onError(error) {
 		throw error
 	}
 
-	const bind = typeof port === 'string'
-		? 'Pipe ' + port
-		: 'Port ' + port
+	const bind = error.address + ':' + error.port
 
 	switch (error.code) {
 		case 'EACCES':
