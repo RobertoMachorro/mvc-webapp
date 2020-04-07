@@ -6,7 +6,7 @@ const http = require('http')
 const core = require('./core')
 
 exports.run = function (options) {
-	// TODO: Check options
+	validateOptions(options)
 
 	debug('port', options.listenPort)
 
@@ -17,6 +17,20 @@ exports.run = function (options) {
 	server.on('listening', onListening)
 
 	return server.listen(options.listenPort)
+}
+
+function validateOptions(options) {
+	if (typeof options.applicationRoot === 'undefined') {
+		throw new TypeError('Application root must be defined.')
+	}
+
+	if (typeof options.listenPort === 'undefined') {
+		throw new TypeError('Listening port must be defined.')
+	}
+
+	if (typeof options.sessionSecret === 'undefined') {
+		throw new TypeError('A session secret salt must be defined.')
+	}
 }
 
 function onError(error) {
