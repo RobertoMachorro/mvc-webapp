@@ -6,6 +6,7 @@ const session = require('express-session')
 const redis = require('redis')
 const logger = require('morgan')
 const createError = require('http-errors')
+const fs = require('fs')
 const path = require('path')
 
 exports.create = function (options) {
@@ -70,6 +71,18 @@ exports.create = function (options) {
 		next()
 	})
 
+	// Load controllers into Express middleware
+	const controllersPath = path.join(options.applicationRoot, 'application/controllers')
+	fs.readdirSync(controllersPath)
+		.filter(file => path.extname(file) === '.js')
+		.forEach(file => {
+			const filepath = path.parse(file)
+			const controller = require(path.join(controllersPath, filepath.name))
+			const sitepath = '/' + ((filepath.name === 'index') ? '' : filepath.name)
+			debug('Loading controller on path:', sitepath)
+			app.use(sitepath, controller)
+		})
+
 	// Catch 404 and forward to error handler
 	app.use((req, res, next) => {
 		next(createError(404, 'Not Found'))
@@ -96,18 +109,3 @@ exports.create = function (options) {
 
 	return app
 }
-
-/* PREVIOUS SUPPORT
-const fs = require('fs')
-
-// Load controllers into Express
-fs.readdirSync('application/controllers')
-	.filter(file => path.extname(file) === '.js')
-	.forEach(file => {
-		const filepath = path.parse(file)
-		const controller = require('./application/controllers/' + filepath.name)
-		const sitepath = '/' + ((filepath.name === 'index') ? '' : filepath.name)
-		app.use(sitepath, controller)
-		debug('Loading controller on path:', sitepath)
-	})
-*/
