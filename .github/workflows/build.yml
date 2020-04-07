@@ -54,6 +54,7 @@ jobs:
         CONTAINER_TAG="docker.pkg.github.com/$REPOSITORY_NAME/$PROJECT_NAME:$BRANCH_NAME-$BUILD_VERSION.$RUN_NUMBER"
         BUILD_TAG="$BRANCH_NAME-$BUILD_VERSION.$RUN_NUMBER"
         #echo ${{secrets.GITHUB_TOKEN}} | docker login -u ${{ github.actor }} --password-stdin docker.pkg.github.com
+        NPM_TOKEN=${{secrets.GITHUB_TOKEN}}
         npm login --registry=https://npm.pkg.github.com/
         #npm publish
         #docker build . --file Dockerfile --tag $CONTAINER_TAG
