@@ -1,0 +1,62 @@
+# This workflow will do a clean install of node dependencies,
+# build the source code and run tests across different versions of node,
+# then will build an NPM Module. Blame Roberto if this Action fails.
+
+name: build
+
+on:
+  push:
+    branches: [ master, production ]
+  pull_request:
+    branches: [ master, production ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [13.x]
+
+    steps:
+    - name: Fetching source code
+      uses: actions/checkout@v2
+    - name: Setting up Node ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Building/Testing
+      env:
+        CI: true
+        NODE_ENV: testing
+      run: |
+        npm ci
+        npm run build --if-present
+        npm test
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: |
+        echo "$GITHUB_CONTEXT"
+    - name: Build NPM Module
+      env:
+        REPOSITORY_NAME: ${{ github.repository }}
+        BRANCH_NAME: ${{ github.ref }}
+        HEAD_REF: ${{ github.head_ref }}
+        BASE_REF: ${{ github.base_ref }}
+        BUILD_VERSION: v1.0
+        RUN_NUMBER: ${{ github.run_number }}
+      run: |
+        REPOSITORY_NAME="${REPOSITORY_NAME,,}"
+        PROJECT_NAME=`echo $REPOSITORY_NAME | awk '{split($0, a, "/"); print a[2];}'`
+        BRANCH_NAME=`echo ${BRANCH_NAME//refs\/heads\//} $BASE_REF $HEAD_REF | awk '{if ($2 != "") print $3; else print $1;}'`
+        CONTAINER_TAG="docker.pkg.github.com/$REPOSITORY_NAME/$PROJECT_NAME:$BRANCH_NAME-$BUILD_VERSION.$RUN_NUMBER"
+        BUILD_TAG="$BRANCH_NAME-$BUILD_VERSION.$RUN_NUMBER"
+        #echo ${{secrets.GITHUB_TOKEN}} | docker login -u ${{ github.actor }} --password-stdin docker.pkg.github.com
+        npm login --registry=https://npm.pkg.github.com/
+        #npm publish
+        #docker build . --file Dockerfile --tag $CONTAINER_TAG
+        #docker push $CONTAINER_TAG
+        #git tag "$BUILD_TAG"
+        #git push --tags
