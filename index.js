@@ -19,6 +19,9 @@ exports.run = function (options) {
 }
 
 function validateOptions(options) {
+	// Options are enforced as opposed to reasonable defaults
+	// This may change in the future
+
 	if (typeof options.applicationRoot === 'undefined') {
 		throw new TypeError('Application root must be defined.')
 	}
