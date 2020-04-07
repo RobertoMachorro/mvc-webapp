@@ -47,17 +47,19 @@ jobs:
         BASE_REF: ${{ github.base_ref }}
         BUILD_VERSION: v1.0
         RUN_NUMBER: ${{ github.run_number }}
+        NPM_REGISTRY: "https://npm.pkg.github.com/"
+        NPM_SCOPE: "@childrescuecoalition"
+        NPM_EMAIL: "rmachorro@childrescuecoalition.org"
+        NPM_USER: ${{ github.actor }}
+        NPM_PASS: ${{secrets.GITHUB_TOKEN}}
       run: |
         REPOSITORY_NAME="${REPOSITORY_NAME,,}"
         PROJECT_NAME=`echo $REPOSITORY_NAME | awk '{split($0, a, "/"); print a[2];}'`
         BRANCH_NAME=`echo ${BRANCH_NAME//refs\/heads\//} $BASE_REF $HEAD_REF | awk '{if ($2 != "") print $3; else print $1;}'`
         CONTAINER_TAG="docker.pkg.github.com/$REPOSITORY_NAME/$PROJECT_NAME:$BRANCH_NAME-$BUILD_VERSION.$RUN_NUMBER"
         BUILD_TAG="$BRANCH_NAME-$BUILD_VERSION.$RUN_NUMBER"
-        NPM_REGISTRY="https://npm.pkg.github.com/"
-        NPM_SCOPE="@childrescuecoalition"
-        NPM_EMAIL="rmachorro@childrescuecoalition.org"
-        NPM_USER=${{ github.actor }}
-        NPM_PASS=${{secrets.GITHUB_TOKEN}}
+        NPM_USER="${NPM_USER,,}"
+        export
         node_modules/.bin/npm-cli-login
         #npm publish
         #docker build . --file Dockerfile --tag $CONTAINER_TAG
