@@ -60,21 +60,21 @@ exports.create = function (options) {
 		next()
 	})
 
+	// Ensure secure connection in production
+	app.use((req, res, next) => {
+		if (!req.secure && req.get('x-forwarded-proto') !== 'https' && process.env.NODE_ENV === 'production') {
+			return res.redirect('https://' + req.get('host') + req.url)
+		}
+
+		next()
+	})
+
 	return app
 }
 
 /* PREVIOUS SUPPORT
 const fs = require('fs')
 const createError = require('http-errors')
-
-// Ensure secure connection in production
-app.use((req, res, next) => {
-	if (!req.secure && req.get('x-forwarded-proto') !== 'https' && process.env.NODE_ENV === 'production') {
-		return res.redirect('https://' + req.get('host') + req.url)
-	}
-
-	next()
-})
 
 // Load controllers into Express
 fs.readdirSync('application/controllers')
