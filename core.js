@@ -23,7 +23,7 @@ exports.create = function (options) {
 	app.use(express.urlencoded({extended: false}))
 	app.use(express.static(path.join(options.applicationRoot, 'application/public')))
 
-	// Session storage
+	// Session Storage
 	if (options.sessionRedisUrl) {
 		const RedisStore = require('connect-redis')(session)
 		const client = redis.createClient({
@@ -51,6 +51,7 @@ exports.create = function (options) {
 		}))
 	}
 
+	// Check for Session Storage
 	app.use((req, res, next) => {
 		if (!req.session) {
 			throw new Error('No session handler found.')
