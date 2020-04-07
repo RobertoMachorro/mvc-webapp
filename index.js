@@ -8,14 +8,13 @@ const core = require('./core')
 exports.run = function (options) {
 	validateOptions(options)
 
-	debug('port', options.listenPort)
-
 	const app = core.create(options)
 	const server = http.createServer(app)
 
 	server.on('error', onError)
 	server.on('listening', onListening)
 
+	debug('port', options.listenPort)
 	return server.listen(options.listenPort)
 }
 
