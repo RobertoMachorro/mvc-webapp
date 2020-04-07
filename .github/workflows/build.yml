@@ -53,9 +53,12 @@ jobs:
         BRANCH_NAME=`echo ${BRANCH_NAME//refs\/heads\//} $BASE_REF $HEAD_REF | awk '{if ($2 != "") print $3; else print $1;}'`
         CONTAINER_TAG="docker.pkg.github.com/$REPOSITORY_NAME/$PROJECT_NAME:$BRANCH_NAME-$BUILD_VERSION.$RUN_NUMBER"
         BUILD_TAG="$BRANCH_NAME-$BUILD_VERSION.$RUN_NUMBER"
-        #echo ${{secrets.GITHUB_TOKEN}} | docker login -u ${{ github.actor }} --password-stdin docker.pkg.github.com
-        NPM_TOKEN=${{secrets.GITHUB_TOKEN}}
-        npm login --registry=https://npm.pkg.github.com/
+        NPM_REGISTRY="https://npm.pkg.github.com/"
+        NPM_SCOPE="@childrescuecoalition"
+        NPM_EMAIL="rmachorro@childrescuecoalition.org"
+        NPM_USER=${{ github.actor }}
+        NPM_PASS=${{secrets.GITHUB_TOKEN}}
+        node_modules/.bin/npm-cli-login
         #npm publish
         #docker build . --file Dockerfile --tag $CONTAINER_TAG
         #docker push $CONTAINER_TAG
