@@ -10,6 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/ChildRescueCoalition/webapp.git"
   },
+  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
   "keywords": [
     "framework"
   ],
