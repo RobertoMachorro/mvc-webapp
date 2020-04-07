@@ -1,68 +1,35 @@
-# This workflow will do a clean install of node dependencies,
-# build the source code and run tests across different versions of node,
-# then will build an NPM Module. Blame Roberto if this Action fails.
+# This workflow will do a clean install of node dependencies, build the
+# source code and build an NPM Module. Blame Roberto if this Action fails.
+
+# https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
 
 name: build
 
 on:
-  push:
-    branches: [ master, production ]
-  pull_request:
-    branches: [ master, production ]
+  release:
+    types: [created]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [13.x]
-
     steps:
-    - name: Fetching source code
-      uses: actions/checkout@v2
-    - name: Setting up Node ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: Building/Testing
-      env:
-        CI: true
-        NODE_ENV: testing
-      run: |
-        npm ci
-        npm run build --if-present
-        npm test
-    - name: Dump GitHub context
-      env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
-      run: |
-        echo "$GITHUB_CONTEXT"
-    - name: Build NPM Module
-      env:
-        REPOSITORY_NAME: ${{ github.repository }}
-        BRANCH_NAME: ${{ github.ref }}
-        HEAD_REF: ${{ github.head_ref }}
-        BASE_REF: ${{ github.base_ref }}
-        BUILD_VERSION: v1.0
-        RUN_NUMBER: ${{ github.run_number }}
-        NPM_REGISTRY: "https://npm.pkg.github.com/"
-        NPM_SCOPE: "@childrescuecoalition"
-        NPM_EMAIL: "rmachorro@childrescuecoalition.org"
-        NPM_USER: ${{ github.actor }}
-        NPM_PASS: ${{secrets.GITHUB_TOKEN}}
-      run: |
-        REPOSITORY_NAME="${REPOSITORY_NAME,,}"
-        PROJECT_NAME=`echo $REPOSITORY_NAME | awk '{split($0, a, "/"); print a[2];}'`
-        BRANCH_NAME=`echo ${BRANCH_NAME//refs\/heads\//} $BASE_REF $HEAD_REF | awk '{if ($2 != "") print $3; else print $1;}'`
-        CONTAINER_TAG="docker.pkg.github.com/$REPOSITORY_NAME/$PROJECT_NAME:$BRANCH_NAME-$BUILD_VERSION.$RUN_NUMBER"
-        BUILD_TAG="$BRANCH_NAME-$BUILD_VERSION.$RUN_NUMBER"
-        NPM_USER="${NPM_USER,,}"
-        export
-        node_modules/.bin/npm-cli-login
-        #npm publish
-        #docker build . --file Dockerfile --tag $CONTAINER_TAG
-        #docker push $CONTAINER_TAG
-        #git tag "$BUILD_TAG"
-        #git push --tags
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - run: npm ci
+      - run: npm test
+
+  publish-gpr:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: https://npm.pkg.github.com/
+      - run: npm ci
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
