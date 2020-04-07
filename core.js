@@ -5,6 +5,7 @@ const express = require('express')
 const session = require('express-session')
 const redis = require('redis')
 const logger = require('morgan')
+const createError = require('http-errors')
 const path = require('path')
 
 exports.create = function (options) {
@@ -69,12 +70,35 @@ exports.create = function (options) {
 		next()
 	})
 
+	// Catch 404 and forward to error handler
+	app.use((req, res, next) => {
+		next(createError(404, 'Not Found'))
+	})
+
+	// Error handler
+	app.use((err, req, res, next) => {
+		if (res.headersSent) {
+			return next(err)
+		}
+
+		res.status(err.status || 500)
+		if (options.errorMiddleware) {
+			options.errorMiddleware(err, req, res, next)
+		} else {
+			res.json({
+				title: 'Default Error Handler',
+				status: err.status,
+				message: err.message,
+				stack: req.app.get('env') === 'development' ? err.stack : ''
+			})
+		}
+	})
+
 	return app
 }
 
 /* PREVIOUS SUPPORT
 const fs = require('fs')
-const createError = require('http-errors')
 
 // Load controllers into Express
 fs.readdirSync('application/controllers')
@@ -86,29 +110,4 @@ fs.readdirSync('application/controllers')
 		app.use(sitepath, controller)
 		debug('Loading controller on path:', sitepath)
 	})
-
-// Catch 404 and forward to error handler
-app.use((req, res, next) => {
-	next(createError(404))
-})
-
-// Error handler
-app.use((err, req, res, next) => {
-	if (res.headersSent) {
-		return next(err)
-	}
-
-	res.status(err.status || 500)
-	if (req.xhr) {
-		res.json({error: err.message})
-	} else {
-		res.render('error', {
-			title: err.status,
-			message: err.message,
-			stack: req.app.get('env') === 'development' ? err.stack : ''
-		})
-	}
-})
-
-module.exports = app
 */
