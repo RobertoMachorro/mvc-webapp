@@ -71,6 +71,14 @@ exports.create = function (options) {
 		next()
 	})
 
+	// Cross Origin Resource Sharing
+	app.options('/*', (req, res, _) => {
+		res.header('Access-Control-Allow-Origin', '*')
+		res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+		res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With')
+		res.send(200)
+	})
+
 	// Load controllers into Express middleware
 	const controllersPath = path.join(options.applicationRoot, 'application/controllers')
 	fs.readdirSync(controllersPath)
