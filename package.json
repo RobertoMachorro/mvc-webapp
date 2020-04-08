@@ -1,6 +1,6 @@
 {
   "name": "@childrescuecoalition/webapp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A microservice framework for MVC web applications and RESTful APIs.",
   "main": "index.js",
   "scripts": {
