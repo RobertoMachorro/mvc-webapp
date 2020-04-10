@@ -75,7 +75,7 @@ exports.create = function (options) {
 	app.options('/*', (req, res, _) => {
 		res.header('Access-Control-Allow-Origin', '*')
 		res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-		res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With, api_key')
+		res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With, X-Api-Key')
 		res.send(200)
 	})
 
