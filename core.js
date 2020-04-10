@@ -72,12 +72,14 @@ exports.create = function (options) {
 	})
 
 	// Cross Origin Resource Sharing
-	app.options('/*', (req, res, _) => {
-		res.header('Access-Control-Allow-Origin', '*')
-		res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-		res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With, X-Api-Key')
-		res.send(200)
-	})
+	if (options.allowCORS) {
+		app.options('/*', (req, res, _) => {
+			res.header('Access-Control-Allow-Origin', '*')
+			res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+			res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With, X-Api-Key')
+			res.send(200)
+		})
+	}
 
 	// Load controllers into Express middleware
 	const controllersPath = path.join(options.applicationRoot, 'application/controllers')
