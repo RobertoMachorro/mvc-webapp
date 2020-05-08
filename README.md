@@ -1,22 +1,19 @@
-# @childrescuecoalition/webapp
+# mvc-webapp node module
 
-A microservice framework for MVC web applications and RESTful APIs.
+A simple framework for MVC web applications and RESTful APIs.
 
-# Installing and Using
+## Features
 
-## Self Setup
+* Express based HTTP handling and routes
+* Familiar MVC folder structure and URL paths (controller per file, public folder for static content, etc)
+* Optional shared session management using Redis (falls-back to memorystore)
+* CORS support (HTTP OPTIONS)
+* Flexible logging formatting using Morgan
+* Out of the box support for EJS templates in Views, and partials
+* Use any Node based data access module for storage
+* Custom error handling
+* Tiny and clean; outside of NPM dependencies, the code is about ~200 lines
 
-NPM wants to always pull from it's home repository. You have to indicate that you are fetching from a different repository based on scope, by logging in:
+## Setup
 
-```
-$ npm login --registry=https://npm.pkg.github.com/ --scope=@childrescuecoalition
-$ npm install @childrescuecoalition/webapp
-```
-
-**Note 1:** You will only need to authenticate once, unless you use the _--always-auth_ option when logging in.
-
-**Note 2:** Your username and e-mail are the ones from GitHub, however don't use your password, instead create an [access token](https://github.com/settings/tokens).
-
-## From Template
-
-An easy alternative is to [create a new repository](/new) and then choose [@childrescuecoalition/microserver](/ChildRescueCoalition/microserver) as your _Repository Template_. At that point you have a basic webapp ready to run.
+_Instructions go here..._

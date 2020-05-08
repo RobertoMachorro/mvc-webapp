@@ -1,27 +1,27 @@
 {
-  "name": "@childrescuecoalition/webapp",
-  "version": "1.0.3",
-  "description": "A microservice framework for MVC web applications and RESTful APIs.",
+  "name": "mvc-webapp",
+  "version": "1.0.0",
+  "description": "A simple framework for MVC web applications and RESTful APIs.",
   "main": "index.js",
   "scripts": {
     "test": "xo"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ChildRescueCoalition/webapp.git"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
+    "url": "git+https://github.com/RobertoMachorro/mvc-webapp.git"
   },
   "keywords": [
-    "framework"
+    "framework",
+    "mvc",
+    "express",
+    "webapp"
   ],
   "author": "Roberto Machorro",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ChildRescueCoalition/webapp/issues"
+    "url": "https://github.com/RobertoMachorro/mvc-webapp/issues"
   },
-  "homepage": "https://github.com/ChildRescueCoalition/webapp#readme",
+  "homepage": "https://github.com/RobertoMachorro/mvc-webapp#readme",
   "dependencies": {
     "connect-redis": "^4.0.4",
     "debug": "^4.1.1",
