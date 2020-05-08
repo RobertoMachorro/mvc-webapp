@@ -4,6 +4,7 @@ A simple framework for MVC web applications and RESTful APIs.
 
 ## Features
 
+* Docker container ready
 * Express based HTTP handling and routes
 * Familiar MVC folder structure and URL paths (controller per file, public folder for static content, etc)
 * Optional shared session management using Redis (falls-back to memorystore)
@@ -88,6 +89,21 @@ res.render('index', {
 ```
 
 4. Run using **npm start** or **node app.js** - added the env var _DEBUG="mvc-webapp:*"_ to see what the framekwork is doing behind the scenes.
+
+## Docker Support
+
+Add the following file to the root folder and _docker build_:
+
+```Dockerfile
+FROM node:latest
+
+WORKDIR /app
+ADD . /app
+
+RUN npm install
+
+CMD ["npm","start"]
+```
 
 ## Also Checkout
 
