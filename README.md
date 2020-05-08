@@ -88,3 +88,8 @@ res.render('index', {
 ```
 
 4. Run using **npm start** or **node app.js** - added the env var _DEBUG="mvc-webapp:*"_ to see what the framekwork is doing behind the scenes.
+
+## Also Checkout
+
+1. [EJS Templates](https://ejs.co) - this is what the views use
+2. [Express](https://expressjs.com) - this is what powers the HTTP communication
