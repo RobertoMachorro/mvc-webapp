@@ -47,23 +47,16 @@ webapp.run({
 	sessionSecret: process.env.SESSION_SECRET || 'NOT_SO_SECRET',
 	redirectSecure: true,
 	errorMiddleware: (err, req, res, _) => {
-		if (req.xhr) {
-			res.json({
-				status: err.status,
-				message: err.message,
-				stack: req.app.get('env') === 'development' ? err.stack : ''
-			})
-		} else {
-			res.render('error', {
-				pageTitle: 'Oops!',
-				status: err.status,
-				message: err.message,
-				stack: req.app.get('env') === 'development' ? err.stack : ''
-			})
-		}
+		res.json({
+			status: err.status,
+			message: err.message,
+			stack: req.app.get('env') === 'development' ? err.stack : ''
+		})
 	}
 })
 ```
+
+The error handling can be customized to return plain JSON, HTTP codes or an EJS rendered page, your choice.
 
 3. Add an initial controller, this will be automatically mapped to a path (login.js becomes /login/<method>/<params>):
 
@@ -79,6 +72,8 @@ router.get('/', (req, res, _) => {
 		data: null
 	})
 })
+
+module.exports = router
 ```
 
 This should be familiar to any Express user. A special exception is made for the index.js controller file, this is mapped to the root / folder.
@@ -92,4 +87,4 @@ res.render('index', {
 })
 ```
 
-4. Run using **npm start** or **node app.js**
+4. Run using **npm start** or **node app.js** - added the env var _DEBUG="mvc-webapp:*"_ to see what the framekwork is doing behind the scenes.
