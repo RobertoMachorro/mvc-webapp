@@ -1,6 +1,6 @@
 'use strict'
 
-const debug = require('debug')('webapp:server')
+const debug = require('debug')('mvc-webapp:server')
 const http = require('http')
 
 const core = require('./core')

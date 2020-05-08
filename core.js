@@ -1,6 +1,6 @@
 'use strict'
 
-const debug = require('debug')('webapp:core')
+const debug = require('debug')('mvc-webapp:core')
 const express = require('express')
 const session = require('express-session')
 const redis = require('redis')
