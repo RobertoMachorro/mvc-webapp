@@ -14,6 +14,82 @@ A simple framework for MVC web applications and RESTful APIs.
 * Custom error handling
 * Tiny and clean; outside of NPM dependencies, the code is about ~200 lines
 
-## Setup
+## Setup and First Webapp
 
-_Instructions go here..._
+1. Follow these steps to get started with your first mvc-webapp:
+
+```bash
+mkdir test-app
+cd test-app
+npm init
+npm install mvc-webapp --save
+mkdir -p application/models
+mkdir -p application/controllers
+mkdir -p application/views
+mkdir -p application/public
+```
+
+At some point this will be automated by a script, for now, it will involve some keystrokes.
+
+2. Add an entry point app.js on the root folder. This contains your app options and can be configurable via env-vars for container usage:
+
+```javascript
+#!/usr/bin/env node
+
+'use strict'
+
+const webapp = require('mvc-webapp')
+
+webapp.run({
+	applicationRoot: process.env.PWD,
+	listenPort: process.env.PORT || '3000',
+	sessionRedisUrl: process.env.REDISCLOUD_URL || undefined,
+	sessionSecret: process.env.SESSION_SECRET || 'NOT_SO_SECRET',
+	redirectSecure: true,
+	errorMiddleware: (err, req, res, _) => {
+		if (req.xhr) {
+			res.json({
+				status: err.status,
+				message: err.message,
+				stack: req.app.get('env') === 'development' ? err.stack : ''
+			})
+		} else {
+			res.render('error', {
+				pageTitle: 'Oops!',
+				status: err.status,
+				message: err.message,
+				stack: req.app.get('env') === 'development' ? err.stack : ''
+			})
+		}
+	}
+})
+```
+
+3. Add an initial controller, this will be automatically mapped to a path (login.js becomes /login/<method>/<params>):
+
+```javascript
+'use strict'
+
+const express = require('express')
+const router = new express.Router()
+
+router.get('/', (req, res, _) => {
+	res.json({
+		status: 'OK',
+		data: null
+	})
+})
+```
+
+This should be familiar to any Express user. A special exception is made for the index.js controller file, this is mapped to the root / folder.
+
+Additionally, any routes inside that controller, get appended as a method. In order to render the EJS view, invoke the view (file)name in the res.render call:
+
+```javascript
+res.render('index', {
+	title: 'Homepage',
+	user: 'octopie'
+})
+```
+
+4. Run using **npm start** or **node app.js**
