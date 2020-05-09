@@ -1,3 +1,7 @@
+![GitHub](https://img.shields.io/github/license/RobertoMachorro/mvc-webapp)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/RobertoMachorro/mvc-webapp)
+![build](https://github.com/RobertoMachorro/mvc-webapp/workflows/build/badge.svg)
+
 # mvc-webapp node module
 
 A simple framework for MVC web applications and RESTful APIs.
