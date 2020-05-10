@@ -81,9 +81,9 @@ router.get('/', (req, res, _) => {
 module.exports = router
 ```
 
-This should be familiar to any Express user. A special exception is made for the index.js controller file, this is mapped to the root / folder.
+This should be familiar to any Express user. A special exception is made for the index.js controller file, this is mapped to the root / folder. Additionally, any routes inside that controller, get appended as a method.
 
-Additionally, any routes inside that controller, get appended as a method. In order to render the EJS view, invoke the view (file)name in the res.render call:
+In order to render the EJS view, invoke the view (file)name in the res.render call:
 
 ```javascript
 res.render('index', {
@@ -92,7 +92,7 @@ res.render('index', {
 })
 ```
 
-4. Run using **npm start** or **node app.js** - added the env var _DEBUG="mvc-webapp:*"_ to see what the framekwork is doing behind the scenes.
+4. Run using **npm start** or **node app.js** - added the env var _DEBUG="mvc-webapp:*"_ to see what the framework is doing behind the scenes.
 
 ## Docker Support
 
