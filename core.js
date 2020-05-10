@@ -56,7 +56,7 @@ exports.create = function (options) {
 	// Check for Session Storage
 	app.use((req, res, next) => {
 		if (!req.session) {
-			throw new Error('No session handler found.')
+			return next(createError(500, 'No session handler found'))
 		}
 
 		next()
