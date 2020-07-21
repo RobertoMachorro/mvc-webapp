@@ -34,7 +34,7 @@
     "redis": "^3.0.2"
   },
   "devDependencies": {
-    "xo": "^0.25.4"
+    "xo": "^0.32.1"
   },
   "xo": {
     "semicolon": false
