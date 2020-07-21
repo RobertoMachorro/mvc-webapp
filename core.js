@@ -54,8 +54,8 @@ exports.create = function (options) {
 	}
 
 	// Check for Session Storage
-	app.use((req, res, next) => {
-		if (!req.session) {
+	app.use((request, response, next) => {
+		if (!request.session) {
 			return next(createError(500, 'No session handler found'))
 		}
 
@@ -63,9 +63,9 @@ exports.create = function (options) {
 	})
 
 	// Ensure secure connection in production
-	app.use((req, res, next) => {
-		if (!req.secure && req.get('x-forwarded-proto') !== 'https' && process.env.NODE_ENV === 'production') {
-			return res.redirect('https://' + req.get('host') + req.url)
+	app.use((request, response, next) => {
+		if (!request.secure && request.get('x-forwarded-proto') !== 'https' && process.env.NODE_ENV === 'production') {
+			return response.redirect('https://' + request.get('host') + request.url)
 		}
 
 		next()
@@ -73,11 +73,11 @@ exports.create = function (options) {
 
 	// Cross Origin Resource Sharing
 	if (options.allowCORS) {
-		app.options('/*', (req, res, _) => {
-			res.header('Access-Control-Allow-Origin', '*')
-			res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-			res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With, X-Api-Key')
-			res.send(200)
+		app.options('/*', (request, response, _) => {
+			response.header('Access-Control-Allow-Origin', '*')
+			response.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+			response.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With, X-Api-Key')
+			response.send(200)
 		})
 	}
 
@@ -94,25 +94,25 @@ exports.create = function (options) {
 		})
 
 	// Catch 404 and forward to error handler
-	app.use((req, res, next) => {
+	app.use((request, response, next) => {
 		next(createError(404, 'Not Found'))
 	})
 
 	// Error handler
-	app.use((err, req, res, next) => {
-		if (res.headersSent) {
+	app.use((err, request, response, next) => {
+		if (response.headersSent) {
 			return next(err)
 		}
 
-		res.status(err.status || 500)
+		response.status(err.status || 500)
 		if (options.errorMiddleware) {
-			options.errorMiddleware(err, req, res, next)
+			options.errorMiddleware(err, request, response, next)
 		} else {
-			res.json({
+			response.json({
 				title: 'Default Error Handler',
 				status: err.status,
 				message: err.message,
-				stack: req.app.get('env') === 'development' ? err.stack : ''
+				stack: request.app.get('env') === 'development' ? err.stack : ''
 			})
 		}
 	})
