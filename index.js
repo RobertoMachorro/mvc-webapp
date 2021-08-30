@@ -1,7 +1,7 @@
-const debug = require('debug')('mvc-webapp:server')
 const http = require('http')
+const debug = require('debug')('mvc-webapp:server')
 
-const core = require('./core')
+const core = require('./core.js')
 
 exports.run = function (options) {
 	validateOptions(options)

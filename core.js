@@ -1,11 +1,12 @@
+const fs = require('fs')
+const path = require('path')
+const process = require('process')
 const debug = require('debug')('mvc-webapp:core')
 const express = require('express')
 const session = require('express-session')
 const redis = require('redis')
 const logger = require('morgan')
 const createError = require('http-errors')
-const fs = require('fs')
-const path = require('path')
 
 exports.create = function (options) {
 	debug('application root', options.applicationRoot)
