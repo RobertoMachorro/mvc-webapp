@@ -1,5 +1,3 @@
-'use strict'
-
 const debug = require('debug')('mvc-webapp:server')
 const http = require('http')
 

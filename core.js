@@ -1,5 +1,3 @@
-'use strict'
-
 const debug = require('debug')('mvc-webapp:core')
 const express = require('express')
 const session = require('express-session')
@@ -29,7 +27,7 @@ exports.create = function (options) {
 	if (options.sessionRedisUrl) {
 		const RedisStore = require('connect-redis')(session)
 		const client = redis.createClient({
-			url: options.sessionRedisUrl
+			url: options.sessionRedisUrl,
 		})
 		app.enable('trust proxy')
 		debug('Setting up for Redis session management.')
@@ -37,7 +35,7 @@ exports.create = function (options) {
 			secret: options.sessionSecret,
 			resave: false,
 			saveUninitialized: false,
-			store: new RedisStore({client})
+			store: new RedisStore({client}),
 		}))
 	} else {
 		const MemoryStore = require('memorystore')(session)
@@ -47,9 +45,9 @@ exports.create = function (options) {
 			resave: false,
 			saveUninitialized: false,
 			store: new MemoryStore({
-				ttl: 600000, // TTL with 10m
-				checkPeriod: 3600000 // Prune expired entries every 1h
-			})
+				ttl: 600_000, // TTL with 10m
+				checkPeriod: 3_600_000, // Prune expired entries every 1h
+			}),
 		}))
 	}
 
@@ -83,15 +81,14 @@ exports.create = function (options) {
 
 	// Load controllers into Express middleware
 	const controllersPath = path.join(options.applicationRoot, 'application/controllers')
-	fs.readdirSync(controllersPath)
-		.filter(file => path.extname(file) === '.js')
-		.forEach(file => {
-			const filepath = path.parse(file)
-			const controller = require(path.join(controllersPath, filepath.name))
-			const sitepath = '/' + ((filepath.name === 'index') ? '' : filepath.name)
-			debug('Loading controller on path:', sitepath)
-			app.use(sitepath, controller)
-		})
+	for (const file of fs.readdirSync(controllersPath)
+		.filter(file => path.extname(file) === '.js')) {
+		const filepath = path.parse(file)
+		const controller = require(path.join(controllersPath, filepath.name))
+		const sitepath = '/' + ((filepath.name === 'index') ? '' : filepath.name)
+		debug('Loading controller on path:', sitepath)
+		app.use(sitepath, controller)
+	}
 
 	// Catch 404 and forward to error handler
 	app.use((request, response, next) => {
@@ -99,20 +96,20 @@ exports.create = function (options) {
 	})
 
 	// Error handler
-	app.use((err, request, response, next) => {
+	app.use((error, request, response, next) => {
 		if (response.headersSent) {
-			return next(err)
+			return next(error)
 		}
 
-		response.status(err.status || 500)
+		response.status(error.status || 500)
 		if (options.errorMiddleware) {
-			options.errorMiddleware(err, request, response, next)
+			options.errorMiddleware(error, request, response, next)
 		} else {
 			response.json({
 				title: 'Default Error Handler',
-				status: err.status,
-				message: err.message,
-				stack: request.app.get('env') === 'development' ? err.stack : ''
+				status: error.status,
+				message: error.message,
+				stack: request.app.get('env') === 'development' ? error.stack : '',
 			})
 		}
 	})
