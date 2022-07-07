@@ -63,7 +63,7 @@ exports.create = function (options) {
 
 	// Ensure secure connection in production
 	app.use((request, response, next) => {
-		if (!request.secure && request.get('x-forwarded-proto') !== 'https' && process.env.NODE_ENV === 'production') {
+		if (options.redirectSecure && !request.secure && request.get('x-forwarded-proto') !== 'https' && process.env.NODE_ENV === 'production') {
 			return response.redirect('https://' + request.get('host') + request.url)
 		}
 
