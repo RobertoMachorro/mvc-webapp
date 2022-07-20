@@ -16,6 +16,12 @@ exports.run = function (options) {
 	return server.listen(options.listenPort)
 }
 
+exports.test = function (options) {
+	validateOptions(options)
+
+	return core.create(options)
+}
+
 function validateOptions(options) {
 	// Options are enforced as opposed to reasonable defaults
 	// This may change in the future
