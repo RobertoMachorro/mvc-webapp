@@ -31,6 +31,7 @@ npm install mvc-webapp --save
 mkdir -p application/models
 mkdir -p application/controllers
 mkdir -p application/views
+mkdir -p application/adapters
 mkdir -p application/public
 ```
 
@@ -41,8 +42,6 @@ At some point this will be automated by a script, for now, it will involve some 
 ```javascript
 #!/usr/bin/env node
 
-'use strict'
-
 const webapp = require('mvc-webapp')
 
 webapp.run({
@@ -51,13 +50,13 @@ webapp.run({
 	sessionRedisUrl: process.env.REDISCLOUD_URL || undefined,
 	sessionSecret: process.env.SESSION_SECRET || 'NOT_SO_SECRET',
 	redirectSecure: true,
-	errorMiddleware: (err, req, res, _) => {
-		res.json({
-			status: err.status,
-			message: err.message,
-			stack: req.app.get('env') === 'development' ? err.stack : ''
+	errorMiddleware: (error, request, response, _) => {
+		response.json({
+			status: error.status,
+			message: error.message,
+			stack: request.app.get('env') === 'development' ? error.stack : '',
 		})
-	}
+	},
 })
 ```
 
@@ -66,15 +65,14 @@ The error handling can be customized to return plain JSON, HTTP codes or an EJS 
 3. Add an initial controller, this will be automatically mapped to a path (login.js becomes /login/<method>/<params>):
 
 ```javascript
-'use strict'
-
 const express = require('express')
+
 const router = new express.Router()
 
-router.get('/', (req, res, _) => {
-	res.json({
+router.get('/', (request, response, _) => {
+	response.json({
 		status: 'OK',
-		data: null
+		data: null,
 	})
 })
 
@@ -86,7 +84,7 @@ This should be familiar to any Express user. A special exception is made for the
 In order to render the EJS view, invoke the view (file)name in the res.render call:
 
 ```javascript
-res.render('index', {
+response.render('index', {
 	title: 'Homepage',
 	user: 'octopie'
 })
