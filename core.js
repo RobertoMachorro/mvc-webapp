@@ -4,8 +4,9 @@ const process = require('process')
 const debug = require('debug')('mvc-webapp:core')
 const express = require('express')
 const session = require('express-session')
-const redis = require('redis')
+const Redis = require('redis')
 const logger = require('morgan')
+const RedisStore = require("connect-redis").default
 
 exports.create = function (options) {
 	debug('application root', options.applicationRoot)
@@ -26,16 +27,19 @@ exports.create = function (options) {
 
 	// Session Storage
 	if (options.sessionRedisUrl) {
-		const RedisStore = require('connect-redis')(session)
-		const client = redis.createClient({
+		const redisClient = Redis.createClient({
 			url: options.sessionRedisUrl,
+		})
+		const redisStore = new RedisStore({
+			client: redisClient,
+			prefix: "session:"
 		})
 		debug('Setting up for Redis session management.')
 		app.use(session({
 			secret: options.sessionSecret,
 			resave: false,
 			saveUninitialized: false,
-			store: new RedisStore({client}),
+			store: redisStore,
 		}))
 	}
 
@@ -65,9 +69,22 @@ exports.create = function (options) {
 		const filepath = path.parse(file)
 		const controller = require(path.join(controllersPath, filepath.name))
 		const sitepath = '/' + ((filepath.name === 'index') ? '' : filepath.name)
+		const subapp = express()
 		debug('Loading controller on path:', sitepath)
-		app.use(sitepath, controller)
+		app.use(sitepath, controller.actions(subapp))
 	}
+
+	// File Not Found
+	app.use((request, response, next) => {
+		if (options.notfoundMiddleware) {
+			options.notfoundMiddleware(request, response, next)
+		} else {
+			response.status(404).json({
+				code: 404,
+				message: 'File Not Found'
+			})
+		}
+	})
 
 	// Error handler
 	app.use((error, request, response, next) => {
@@ -75,15 +92,12 @@ exports.create = function (options) {
 			return next(error)
 		}
 
-		response.status(error.status || 500)
 		if (options.errorMiddleware) {
 			options.errorMiddleware(error, request, response, next)
 		} else {
-			response.json({
-				title: 'Default Error Handler',
-				status: error.status,
-				message: error.message,
-				stack: request.app.get('env') === 'development' ? error.stack : '',
+			response.status(500).json({
+				code: 500,
+				message: error
 			})
 		}
 	})
