@@ -6,7 +6,6 @@ const express = require('express')
 const session = require('express-session')
 const redis = require('redis')
 const logger = require('morgan')
-const createError = require('http-errors')
 
 exports.create = function (options) {
 	debug('application root', options.applicationRoot)
@@ -19,10 +18,11 @@ exports.create = function (options) {
 	app.set('view engine', 'ejs')
 
 	// Engine options
-	app.use(logger('dev'))
+	app.use(logger('common'))
 	app.use(express.json())
 	app.use(express.urlencoded({extended: false}))
 	app.use(express.static(path.join(options.applicationRoot, 'application/public')))
+	app.enable('trust proxy')
 
 	// Session Storage
 	if (options.sessionRedisUrl) {
@@ -30,7 +30,6 @@ exports.create = function (options) {
 		const client = redis.createClient({
 			url: options.sessionRedisUrl,
 		})
-		app.enable('trust proxy')
 		debug('Setting up for Redis session management.')
 		app.use(session({
 			secret: options.sessionSecret,
@@ -38,28 +37,7 @@ exports.create = function (options) {
 			saveUninitialized: false,
 			store: new RedisStore({client}),
 		}))
-	} else {
-		const MemoryStore = require('memorystore')(session)
-		debug('Setting up for Memory session management.')
-		app.use(session({
-			secret: options.sessionSecret,
-			resave: false,
-			saveUninitialized: false,
-			store: new MemoryStore({
-				ttl: 600_000, // TTL with 10m
-				checkPeriod: 3_600_000, // Prune expired entries every 1h
-			}),
-		}))
 	}
-
-	// Check for Session Storage
-	app.use((request, response, next) => {
-		if (!request.session) {
-			return next(createError(500, 'No session handler found'))
-		}
-
-		next()
-	})
 
 	// Ensure secure connection in production
 	app.use((request, response, next) => {
@@ -90,11 +68,6 @@ exports.create = function (options) {
 		debug('Loading controller on path:', sitepath)
 		app.use(sitepath, controller)
 	}
-
-	// Catch 404 and forward to error handler
-	app.use((request, response, next) => {
-		next(createError(404, 'Not Found'))
-	})
 
 	// Error handler
 	app.use((error, request, response, next) => {
