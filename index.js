@@ -34,8 +34,4 @@ function validateOptions(options) {
 		typeof options.sessionRedisUrl !== 'undefined') {
 		throw new TypeError('A session secret salt must be defined.')
 	}
-
-	if (typeof options.redirectSecure === 'undefined') {
-		throw new TypeError('Redirect to secure protocol must be defined.')
-	}
 }

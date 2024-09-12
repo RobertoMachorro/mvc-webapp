@@ -9,21 +9,29 @@ const logger = require('morgan')
 const RedisStore = require("connect-redis").default
 
 exports.create = function (options) {
-	debug('application root', options.applicationRoot)
+	debug('Application Root:', options.applicationRoot)
 
 	const app = express()
 	app.set('port', options.listenPort)
 
 	// View engine setup
-	app.set('views', path.join(options.applicationRoot, 'application/views'))
-	app.set('view engine', 'ejs')
+	if (options.viewEngine) {
+		app.set('views', path.join(options.applicationRoot, 'application/views'))
+		app.set('view engine', options.viewEngine)
+		debug('View Engine:', options.viewEngine)
+	}
 
 	// Engine options
-	app.use(logger('common'))
+	app.use(logger(options.loggerFormat || 'common'))
 	app.use(express.json())
 	app.use(express.urlencoded({extended: false}))
 	app.use(express.static(path.join(options.applicationRoot, 'application/public')))
-	app.enable('trust proxy')
+
+	// Trust Proxy
+	if (options.trustProxy) {
+		app.enable('trust proxy')
+		debug('Trusting Proxy.')
+	}
 
 	// Session Storage
 	if (options.sessionRedisUrl) {
@@ -44,13 +52,15 @@ exports.create = function (options) {
 	}
 
 	// Ensure secure connection in production
-	app.use((request, response, next) => {
-		if (options.redirectSecure && !request.secure && request.get('x-forwarded-proto') !== 'https' && process.env.NODE_ENV === 'production') {
-			return response.redirect('https://' + request.get('host') + request.url)
-		}
-
-		next()
-	})
+	if (options.redirectSecure) {
+		app.use((request, response, next) => {
+			if (options.redirectSecure && !request.secure && request.get('x-forwarded-proto') !== 'https' && process.env.NODE_ENV === 'production') {
+				return response.redirect('https://' + request.get('host') + request.url)
+			}
+	
+			next()
+		})
+	}
 
 	// Cross Origin Resource Sharing
 	if (options.allowCORS) {
