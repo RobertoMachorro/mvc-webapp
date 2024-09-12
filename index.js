@@ -30,8 +30,8 @@ function validateOptions(options) {
 		throw new TypeError('Listening port must be defined.')
 	}
 
-	if (typeof options.sessionSecret === 'undefined' &&
-		typeof options.sessionRedisUrl !== 'undefined') {
+	if (typeof options.sessionSecret === 'undefined'
+		&& typeof options.sessionRedisUrl !== 'undefined') {
 		throw new TypeError('A session secret salt must be defined.')
 	}
 }

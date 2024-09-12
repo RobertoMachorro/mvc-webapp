@@ -6,7 +6,7 @@ const express = require('express')
 const session = require('express-session')
 const Redis = require('redis')
 const logger = require('morgan')
-const RedisStore = require("connect-redis").default
+const RedisStore = require('connect-redis').default
 
 exports.create = function (options) {
 	debug('Application Root:', options.applicationRoot)
@@ -40,7 +40,7 @@ exports.create = function (options) {
 		})
 		const redisStore = new RedisStore({
 			client: redisClient,
-			prefix: "session:"
+			prefix: 'session:'
 		})
 		debug('Setting up for Redis session management.')
 		app.use(session({
@@ -57,7 +57,7 @@ exports.create = function (options) {
 			if (options.redirectSecure && !request.secure && request.get('x-forwarded-proto') !== 'https' && process.env.NODE_ENV === 'production') {
 				return response.redirect('https://' + request.get('host') + request.url)
 			}
-	
+
 			next()
 		})
 	}

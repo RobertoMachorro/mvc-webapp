@@ -29,6 +29,7 @@
   "xo": {
     "semicolon": false,
     "rules": {
+      "comma-dangle": 0,
       "unicorn/prefer-module": 0
     }
   },
