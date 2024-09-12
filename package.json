@@ -23,15 +23,6 @@
     "url": "https://github.com/RobertoMachorro/mvc-webapp/issues"
   },
   "homepage": "https://github.com/RobertoMachorro/mvc-webapp#readme",
-  "dependencies": {
-    "connect-redis": "^4.0.4",
-    "debug": "^4.3.7",
-    "ejs": "^3.1.10",
-    "express": "^4.21.0",
-    "express-session": "^1.18.0",
-    "morgan": "^1.10.0",
-    "redis": "^3.1.2"
-  },
   "devDependencies": {
     "xo": "^0.44.0"
   },
@@ -40,5 +31,14 @@
     "rules": {
       "unicorn/prefer-module": 0
     }
+  },
+  "dependencies": {
+    "connect-redis": "^7.1.1",
+    "debug": "^4.3.7",
+    "ejs": "^3.1.10",
+    "express": "^5.0.0",
+    "express-session": "^1.18.0",
+    "morgan": "^1.10.0",
+    "redis": "^4.7.0"
   }
 }
