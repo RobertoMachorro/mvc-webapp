@@ -8,18 +8,24 @@ const Redis = require('redis')
 const logger = require('morgan')
 const RedisStore = require('connect-redis').default
 
-exports.create = function (options) {
-	debug('Application Root:', options.applicationRoot)
-
+const createApp = function (options) {
 	const app = express()
-	app.set('port', options.listenPort)
 
 	// View engine setup
 	if (options.viewEngine) {
-		app.set('views', path.join(options.applicationRoot, 'application/views'))
+		const viewsPath = path.join(options.applicationRoot, 'application/views')
+		app.set('views', viewsPath)
 		app.set('view engine', options.viewEngine)
-		debug('View Engine:', options.viewEngine)
 	}
+
+	return app
+}
+
+exports.create = function (options) {
+	debug('Application Root:', options.applicationRoot)
+
+	const app = createApp(options)
+	app.set('port', options.listenPort)
 
 	// Engine options
 	app.use(logger(options.loggerFormat || 'common'))
@@ -79,7 +85,7 @@ exports.create = function (options) {
 		const filepath = path.parse(file)
 		const controller = require(path.join(controllersPath, filepath.name))
 		const sitepath = '/' + ((filepath.name === 'index') ? '' : filepath.name)
-		const subapp = express()
+		const subapp = createApp(options)
 		debug('Loading controller on path:', sitepath)
 		app.use(sitepath, controller.actions(subapp))
 	}
