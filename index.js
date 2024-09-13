@@ -1,10 +1,10 @@
 const debug = require('debug')('mvc-webapp:server')
 const core = require('./core.js')
 
-exports.run = function (options) {
+exports.run = async function (options) {
 	validateOptions(options)
 
-	const app = core.create(options)
+	const app = await core.create(options)
 
 	debug('port', options.listenPort)
 	app.listen(options.listenPort)

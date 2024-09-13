@@ -21,7 +21,7 @@ const createApp = function (options) {
 	return app
 }
 
-exports.create = function (options) {
+exports.create = async function (options) {
 	debug('Application Root:', options.applicationRoot)
 
 	const app = createApp(options)
@@ -41,9 +41,11 @@ exports.create = function (options) {
 
 	// Session Storage
 	if (options.sessionRedisUrl) {
-		const redisClient = Redis.createClient({
-			url: options.sessionRedisUrl,
+		const redisClient = await Redis.createClient({
+			url: process.env.REDIS_URL
 		})
+		.on('error', error => debug('Redis Fail', error))
+		.connect();
 		const redisStore = new RedisStore({
 			client: redisClient,
 			prefix: 'session:'
