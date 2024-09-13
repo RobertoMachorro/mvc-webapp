@@ -62,10 +62,20 @@ webapp.run({
 		})
 	},
 	errorMiddleware: (error, request, response, _) => {
-		response.status(500).json({
-			code: 500,
-			message: error
-		})
+		if (request.xhr) {
+			response.status(500).json({
+				code: 500,
+				message: (error.message)? error.message : error,
+				stack: request.app.get('env') === 'development' ? error.stack : ''
+			})
+		} else {
+			response.render('error', {
+				pageTitle: 'Oops!',
+				status: 500,
+				message: (error.message)? error.message : error,
+				stack: request.app.get('env') === 'development' ? error.stack : '',
+			})
+		}
 	},
 })
 ```
