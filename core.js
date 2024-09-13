@@ -4,71 +4,71 @@ const process = require('process')
 const debug = require('debug')('mvc-webapp:core')
 const express = require('express')
 const session = require('express-session')
-const redis = require('redis')
+const Redis = require('redis')
 const logger = require('morgan')
-const createError = require('http-errors')
+const RedisStore = require('connect-redis').default
 
-exports.create = function (options) {
-	debug('application root', options.applicationRoot)
-
+const createApp = function (options) {
 	const app = express()
-	app.set('port', options.listenPort)
 
 	// View engine setup
-	app.set('views', path.join(options.applicationRoot, 'application/views'))
-	app.set('view engine', 'ejs')
+	if (options.viewEngine) {
+		const viewsPath = path.join(options.applicationRoot, 'application/views')
+		app.set('views', viewsPath)
+		app.set('view engine', options.viewEngine)
+	}
+
+	return app
+}
+
+exports.create = async function (options) {
+	debug('Application Root:', options.applicationRoot)
+
+	const app = createApp(options)
+	app.set('port', options.listenPort)
 
 	// Engine options
-	app.use(logger('dev'))
+	app.use(logger(options.loggerFormat || 'common'))
 	app.use(express.json())
 	app.use(express.urlencoded({extended: false}))
 	app.use(express.static(path.join(options.applicationRoot, 'application/public')))
 
+	// Trust Proxy
+	if (options.trustProxy) {
+		app.enable('trust proxy')
+		debug('Trusting Proxy.')
+	}
+
 	// Session Storage
 	if (options.sessionRedisUrl) {
-		const RedisStore = require('connect-redis')(session)
-		const client = redis.createClient({
-			url: options.sessionRedisUrl,
+		const redisClient = await Redis.createClient({
+			url: process.env.REDIS_URL
 		})
-		app.enable('trust proxy')
+			.on('error', error => debug('Redis Fail', error))
+			.connect()
+		const redisStore = new RedisStore({
+			client: redisClient,
+			prefix: 'session:'
+		})
 		debug('Setting up for Redis session management.')
 		app.use(session({
 			secret: options.sessionSecret,
 			resave: false,
 			saveUninitialized: false,
-			store: new RedisStore({client}),
-		}))
-	} else {
-		const MemoryStore = require('memorystore')(session)
-		debug('Setting up for Memory session management.')
-		app.use(session({
-			secret: options.sessionSecret,
-			resave: false,
-			saveUninitialized: false,
-			store: new MemoryStore({
-				ttl: 600_000, // TTL with 10m
-				checkPeriod: 3_600_000, // Prune expired entries every 1h
-			}),
+			store: redisStore,
 		}))
 	}
 
-	// Check for Session Storage
-	app.use((request, response, next) => {
-		if (!request.session) {
-			return next(createError(500, 'No session handler found'))
-		}
-
-		next()
-	})
-
 	// Ensure secure connection in production
-	app.use((request, response, next) => {
-		if (options.redirectSecure && !request.secure && request.get('x-forwarded-proto') !== 'https' && process.env.NODE_ENV === 'production') {
-			return response.redirect('https://' + request.get('host') + request.url)
-		}
+	if (options.redirectSecure) {
+		app.use((request, response, next) => {
+			if (options.redirectSecure && !request.secure && request.get('x-forwarded-proto') !== 'https' && process.env.NODE_ENV === 'production') {
+				return response.redirect('https://' + request.get('host') + request.url)
+			}
 
-		next()
-	})
+			next()
+		})
+	}
 
 	// Cross Origin Resource Sharing
 	if (options.allowCORS) {
@@ -87,13 +87,21 @@ exports.create = function (options) {
 		const filepath = path.parse(file)
 		const controller = require(path.join(controllersPath, filepath.name))
 		const sitepath = '/' + ((filepath.name === 'index') ? '' : filepath.name)
+		const subapp = createApp(options)
 		debug('Loading controller on path:', sitepath)
-		app.use(sitepath, controller)
+		app.use(sitepath, controller.actions(subapp))
 	}
 
-	// Catch 404 and forward to error handler
+	// File Not Found
 	app.use((request, response, next) => {
-		next(createError(404, 'Not Found'))
+		if (options.notfoundMiddleware) {
+			options.notfoundMiddleware(request, response, next)
+		} else {
+			response.status(404).json({
+				code: 404,
+				message: 'File Not Found'
+			})
+		}
 	})
 
 	// Error handler
@@ -102,15 +110,12 @@ exports.create = function (options) {
 			return next(error)
 		}
 
-		response.status(error.status || 500)
 		if (options.errorMiddleware) {
 			options.errorMiddleware(error, request, response, next)
 		} else {
-			response.json({
-				title: 'Default Error Handler',
-				status: error.status,
-				message: error.message,
-				stack: request.app.get('env') === 'development' ? error.stack : '',
+			response.status(500).json({
+				code: 500,
+				message: error
 			})
 		}
 	})
