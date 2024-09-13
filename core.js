@@ -44,8 +44,8 @@ exports.create = async function (options) {
 		const redisClient = await Redis.createClient({
 			url: process.env.REDIS_URL
 		})
-		.on('error', error => debug('Redis Fail', error))
-		.connect();
+			.on('error', error => debug('Redis Fail', error))
+			.connect()
 		const redisStore = new RedisStore({
 			client: redisClient,
 			prefix: 'session:'
