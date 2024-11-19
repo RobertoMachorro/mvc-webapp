@@ -37,8 +37,8 @@
     "connect-redis": "^7.1.1",
     "debug": "^4.3.7",
     "ejs": "^3.1.10",
-    "express": "^5.0.0",
-    "express-session": "^1.18.0",
+    "express": "^5.0.1",
+    "express-session": "^1.18.1",
     "morgan": "^1.10.0",
     "redis": "^4.7.0"
   }
