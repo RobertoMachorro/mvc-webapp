@@ -24,12 +24,11 @@
   },
   "homepage": "https://github.com/RobertoMachorro/mvc-webapp#readme",
   "devDependencies": {
-    "xo": "^0.44.0"
+    "xo": "^2.0.2"
   },
   "xo": {
     "semicolon": false,
     "rules": {
-      "comma-dangle": 0,
       "unicorn/prefer-module": 0
     }
   },

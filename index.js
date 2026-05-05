@@ -22,16 +22,16 @@ function validateOptions(options) {
 	// Options are enforced as opposed to reasonable defaults
 	// This may change in the future
 
-	if (typeof options.applicationRoot === 'undefined') {
+	if (options.applicationRoot === undefined) {
 		throw new TypeError('Application root must be defined.')
 	}
 
-	if (typeof options.listenPort === 'undefined') {
+	if (options.listenPort === undefined) {
 		throw new TypeError('Listening port must be defined.')
 	}
 
-	if (typeof options.sessionSecret === 'undefined'
-		&& typeof options.sessionRedisUrl !== 'undefined') {
+	if (options.sessionSecret === undefined
+		&& options.sessionRedisUrl !== undefined) {
 		throw new TypeError('A session secret salt must be defined.')
 	}
 }
