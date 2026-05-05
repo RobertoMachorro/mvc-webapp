@@ -1,6 +1,6 @@
-const fs = require('fs')
-const path = require('path')
-const process = require('process')
+const fs = require('node:fs')
+const path = require('node:path')
+const process = require('node:process')
 const debug = require('debug')('mvc-webapp:core')
 const express = require('express')
 const session = require('express-session')
@@ -42,13 +42,13 @@ exports.create = async function (options) {
 	// Session Storage
 	if (options.sessionRedisUrl) {
 		const redisClient = await Redis.createClient({
-			url: process.env.REDIS_URL
+			url: process.env.REDIS_URL,
 		})
 			.on('error', error => debug('Redis Fail', error))
 			.connect()
 		const redisStore = new RedisStore({
 			client: redisClient,
-			prefix: 'session:'
+			prefix: 'session:',
 		})
 		debug('Setting up for Redis session management.')
 		app.use(session({
@@ -99,7 +99,7 @@ exports.create = async function (options) {
 		} else {
 			response.status(404).json({
 				code: 404,
-				message: 'File Not Found'
+				message: 'File Not Found',
 			})
 		}
 	})
@@ -115,7 +115,7 @@ exports.create = async function (options) {
 		} else {
 			response.status(500).json({
 				code: 500,
-				message: error
+				message: error,
 			})
 		}
 	})
